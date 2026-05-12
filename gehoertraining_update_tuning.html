@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Gehörtraining</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.18);
+    --text: #1a1a18;
+    --text2: #6b6a65;
+    --text3: #9e9d97;
+    --blue: #185FA5;
+    --blue-light: #E6F1FB;
+    --blue-mid: #B5D4F4;
+    --green: #3B6D11;
+    --green-light: #EAF3DE;
+    --red: #A32D2D;
+    --red-light: #FCEBEB;
+    --amber: #7A4D0A;
+    --amber-light: #FEF3E2;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 1rem 3rem;
+  }
+  .app { width: 100%; max-width: 420px; }
+
+  /* ── Header ── */
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+  .header-icon {
+    width: 42px; height: 42px; border-radius: var(--radius);
+    background: var(--blue-light); border: 1px solid var(--blue-mid);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .header h1 { font-size: 18px; font-weight: 500; }
+  .header p  { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  /* ── Mode tabs ── */
+  .mode-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 1.25rem;
+    border: 1px solid var(--border2); border-radius: var(--radius); overflow: hidden; }
+  .mode-tab {
+    padding: 10px 8px; background: var(--surface); cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 500; color: var(--text2);
+    text-align: center; border: none; transition: all .15s; touch-action: manipulation;
+  }
+  .mode-tab:first-child { border-right: 1px solid var(--border2); }
+  .mode-tab .sub { font-size: 10px; font-weight: 400; color: var(--text3); margin-top: 2px; }
+  .mode-tab.active { background: var(--blue-light); color: #0C447C; }
+  .mode-tab.active .sub { color: var(--blue); }
+
+  /* ── Level row ── */
+  .level-row { display: grid; gap: 8px; margin-bottom: 1.25rem; }
+  .level-row.cols2 { grid-template-columns: 1fr 1fr; }
+  .level-row.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+  .lvl-btn {
+    padding: 9px 6px; border: 1px solid var(--border2); border-radius: var(--radius);
+    background: var(--surface); cursor: pointer; font-family: inherit;
+    font-size: 12px; font-weight: 500; color: var(--text2);
+    text-align: center; transition: all .15s; touch-action: manipulation;
+  }
+  .lvl-btn .sub { font-size: 10px; font-weight: 400; color: var(--text3); margin-top: 2px; }
+  .lvl-btn.active { background: var(--blue-light); border-color: var(--blue); color: #0C447C; }
+  .lvl-btn.active .sub { color: var(--blue); }
+
+  /* ── Stats ── */
+  .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 1.25rem; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem .5rem; text-align: center; }
+  .stat-val { font-size: 22px; font-weight: 500; }
+  .stat-lbl { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+  /* ── Progress bar ── */
+  .pbar { height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 1.25rem; overflow: hidden; }
+  .pfill { height: 100%; background: var(--blue); border-radius: 2px; transition: width .4s ease; }
+
+  /* ── Card ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem; margin-bottom: 1rem; }
+
+  .root-pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 5px 11px; margin-bottom: 1rem;
+  }
+  .root-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
+  .root-pill span { font-size: 13px; font-weight: 500; }
+
+  .lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+
+  /* ── Play buttons ── */
+  .play-grid { display: grid; gap: 7px; margin-bottom: 1rem; }
+  .play-grid.cols2 { grid-template-columns: 1fr 1fr; }
+  .play-grid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+  .pbtn {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 12px 6px; border: 1px solid var(--border2); border-radius: var(--radius);
+    background: var(--surface2); cursor: pointer; font-family: inherit;
+    font-size: 12px; font-weight: 500; color: var(--text);
+    transition: all .15s; width: 100%; touch-action: manipulation;
+  }
+  .pbtn:active:not(:disabled) { background: #e0dfd9; }
+  .pbtn:disabled { opacity: .35; cursor: default; }
+  .pbtn.playing { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+
+  .sep { height: 1px; background: var(--border); margin: 0 0 1rem; }
+
+  /* ── Interval answer buttons ── */
+  .igrid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  .ib {
+    padding: 11px 9px; border: 1px solid var(--border2); border-radius: var(--radius);
+    background: var(--surface); cursor: pointer; font-family: inherit;
+    font-size: 12px; font-weight: 500; color: var(--text);
+    transition: all .15s; text-align: left; width: 100%; touch-action: manipulation;
+  }
+  .ib:active:not(:disabled) { background: var(--surface2); }
+  .ib:disabled { cursor: default; }
+  .ib .ib-sub { font-size: 10px; color: var(--text3); margin-top: 2px; font-weight: 400; }
+  .ib.correct { background: var(--green-light); border-color: var(--green); color: #27500A; }
+  .ib.correct .ib-sub { color: var(--green); }
+  .ib.wrong   { background: var(--red-light);   border-color: var(--red);   color: #791F1F; }
+  .ib.wrong .ib-sub { color: var(--red); }
+
+  /* ── Tuning answer buttons ── */
+  .tune-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+  .tune-btn {
+    padding: 14px 6px; border: 1px solid var(--border2); border-radius: var(--radius);
+    background: var(--surface); cursor: pointer; font-family: inherit;
+    font-size: 12px; font-weight: 500; color: var(--text);
+    transition: all .15s; text-align: center; touch-action: manipulation;
+  }
+  .tune-btn:active:not(:disabled) { background: var(--surface2); }
+  .tune-btn:disabled { cursor: default; }
+  .tune-btn .tune-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+  .tune-btn.correct { background: var(--green-light); border-color: var(--green); color: #27500A; }
+  .tune-btn.wrong   { background: var(--red-light);   border-color: var(--red);   color: #791F1F; }
+
+  /* ── Cent reveal badge ── */
+  .cent-reveal {
+    margin-top: .75rem; padding: .6rem .9rem;
+    border-radius: var(--radius); background: var(--amber-light);
+    border: 1px solid #E8C07A;
+    font-size: 13px; color: var(--amber); font-weight: 500;
+    display: none; align-items: center; gap: 8px;
+  }
+  .cent-reveal.show { display: flex; }
+
+  /* ── Feedback ── */
+  .fb {
+    margin-top: .9rem; padding: .7rem .9rem; border-radius: var(--radius);
+    font-size: 13px; font-weight: 500;
+    display: none; align-items: flex-start; gap: 8px; line-height: 1.4;
+  }
+  .fb.ok  { background: var(--green-light); color: #27500A; display: flex; }
+  .fb.err { background: var(--red-light);   color: #791F1F; display: flex; }
+  .fb svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* ── Next button ── */
+  .nxt {
+    margin-top: .9rem; width: 100%; padding: 13px;
+    border: 1px solid var(--border2); border-radius: var(--radius);
+    background: var(--surface2); cursor: pointer; font-family: inherit;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    display: none; transition: background .15s; touch-action: manipulation;
+  }
+  .nxt:active { background: #e0dfd9; }
+
+  /* ── Weight card ── */
+  .wcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem; margin-bottom: 1rem; }
+  .wgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .witem { background: var(--surface2); border-radius: var(--radius); padding: 7px 9px; }
+  .witem-short { font-size: 12px; font-weight: 500; }
+  .witem-long  { font-size: 10px; color: var(--text2); margin-bottom: 5px; }
+  .wbar-bg   { height: 3px; background: var(--border); border-radius: 2px; }
+  .wbar-fill { height: 3px; border-radius: 2px; }
+
+  /* ── History ── */
+  .hlist { display: flex; flex-direction: column; gap: 4px; margin-top: .75rem; max-height: 160px; overflow-y: auto; }
+  .hitem { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 5px 9px; border-radius: var(--radius); background: var(--surface2); }
+  .badge { padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; }
+  .badge.ok  { background: var(--green-light); color: #27500A; }
+  .badge.err { background: var(--red-light);   color: #791F1F; }
+
+  /* ── Hidden util ── */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M11 3a1 1 0 011 1v9.17A3 3 0 1110 14.83V4a1 1 0 011-1z" fill="#185FA5"/>
+        <circle cx="11" cy="17" r="2.2" fill="#185FA5" opacity=".35"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Gehörtraining</h1>
+      <p id="header-sub">Intervalle hören und erkennen</p>
+    </div>
+  </div>
+
+  <!-- Mode tabs -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="tab-interval" onclick="switchMode('interval')">
+      🎵 Intervalle<div class="sub">Abstände erkennen</div>
+    </button>
+    <button class="mode-tab" id="tab-tuning" onclick="switchMode('tuning')">
+      🎙 Tuning<div class="sub">Verstimmung hören</div>
+    </button>
+  </div>
+
+  <!-- Level row — rendered dynamically -->
+  <div id="level-row-container"></div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="s-total">0</div><div class="stat-lbl">Fragen</div></div>
+    <div class="stat"><div class="stat-val" id="s-correct">0</div><div class="stat-lbl">Richtig</div></div>
+    <div class="stat"><div class="stat-val" id="s-pct">—</div><div class="stat-lbl">Quote</div></div>
+  </div>
+  <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+
+  <!-- Main card -->
+  <div class="card">
+    <div class="root-pill"><div class="root-dot"></div><span id="root-display">Ton: —</span></div>
+
+    <!-- Play buttons -->
+    <div class="lbl">Töne abspielen</div>
+    <div class="play-grid cols2" id="play-grid">
+      <!-- filled dynamically -->
+    </div>
+
+    <div class="sep"></div>
+    <div class="lbl" id="answer-lbl">Welches Intervall?</div>
+
+    <!-- Interval answer grid -->
+    <div class="igrid" id="igrid"></div>
+
+    <!-- Tuning answer buttons -->
+    <div class="tune-grid hidden" id="tune-grid">
+      <button class="tune-btn" id="tbtn-low"  onclick="answerTuning('low')">
+        <span class="tune-icon">▼</span>Zu tief
+      </button>
+      <button class="tune-btn" id="tbtn-tune" onclick="answerTuning('tune')">
+        <span class="tune-icon">✓</span>In Tune
+      </button>
+      <button class="tune-btn" id="tbtn-high" onclick="answerTuning('high')">
+        <span class="tune-icon">▲</span>Zu hoch
+      </button>
+    </div>
+
+    <!-- Cent reveal (tuning bonus) -->
+    <div class="cent-reveal" id="cent-reveal">
+      <span>🎯</span><span id="cent-text"></span>
+    </div>
+
+    <!-- Feedback -->
+    <div class="fb" id="fb">
+      <svg id="fb-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path id="fb-icon-path" d=""/>
+      </svg>
+      <span id="fb-text"></span>
+    </div>
+    <button class="nxt" id="nxt" onclick="nextQ()">Nächste Frage →</button>
+  </div>
+
+  <!-- Weight / history card -->
+  <div class="wcard">
+    <div class="lbl" id="wcard-title">Lerngewichte</div>
+    <div class="wgrid" id="wgrid"></div>
+    <div class="lbl" style="margin-top:1rem;margin-bottom:0">Verlauf</div>
+    <div class="hlist" id="hlist">
+      <div style="font-size:12px;color:#9e9d97;padding:5px 9px">Noch keine Antworten</div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+<script>
+// ─────────────────────────────────────────────
+// INTERVAL DATA
+// ─────────────────────────────────────────────
+const ALL_IVLS = [
+  { name:'Kl. Sekunde', short:'m2', st:1,  level:2 },
+  { name:'Gr. Sekunde', short:'M2', st:2,  level:1 },
+  { name:'Kl. Terz',    short:'m3', st:3,  level:2 },
+  { name:'Gr. Terz',    short:'M3', st:4,  level:1 },
+  { name:'Quarte',      short:'P4', st:5,  level:1 },
+  { name:'Tritonus',    short:'TT', st:6,  level:2 },
+  { name:'Quinte',      short:'P5', st:7,  level:1 },
+  { name:'Kl. Sexte',   short:'m6', st:8,  level:2 },
+  { name:'Gr. Sexte',   short:'M6', st:9,  level:1 },
+  { name:'Kl. Septime', short:'m7', st:10, level:2 },
+  { name:'Gr. Septime', short:'M7', st:11, level:1 },
+  { name:'Oktave',      short:'P8', st:12, level:1 },
+];
+const NOTES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+// Tuning levels: [minCent, maxCent] absolute deviation
+const TUNE_LEVELS = {
+  easy: { min: 20, max: 50, label: 'Easy',  sub: '±20–50 Cent' },
+  hard: { min: 5,  max: 18, label: 'Hard',  sub: '±5–18 Cent'  },
+};
+// Probability of "in tune" question
+const IN_TUNE_PROB = 0.25;
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let actx = null;
+let mode = 'interval';          // 'interval' | 'tuning'
+let ivlLevel = 1;               // 1 | 2
+let tuneLevel = 'easy';         // 'easy' | 'hard'
+let activeIvls = [];
+let ivlWeights = {}; ALL_IVLS.forEach(i => ivlWeights[i.short] = 5);
+// Tuning weights: 'low', 'tune', 'high' — track difficulty per category
+let tuneWeights = { low:5, tune:5, high:5 };
+let stats = { total:0, correct:0 };
+let history = [];
+let cur = {};   // current question state
+
+// ─────────────────────────────────────────────
+// AUDIO
+// ─────────────────────────────────────────────
+function getCtx() {
+  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+  if (actx.state === 'suspended') actx.resume();
+  return actx;
+}
+function midiToHz(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+function centsToHz(baseHz, cents) { return baseHz * Math.pow(2, cents / 1200); }
+
+function playWarmNote(ac, freq, startTime) {
+  const master = ac.createGain();
+  master.gain.setValueAtTime(0.38, startTime);
+  master.connect(ac.destination);
+  const partials = [
+    [1, 1.00, 0.0],[2, 0.60, 1.3],[3, 0.30, -0.9],[4, 0.16, 1.6],
+    [5, 0.09,-1.1],[6, 0.055, 0.6],[7, 0.030,-0.7],[8, 0.018, 1.0],
+    [9, 0.010,-0.5],[10,0.006, 0.4],[12,0.003, 0.0],
+  ];
+  const attackTime = 0.016, decayTime = 4.2;
+  partials.forEach(([mult, amp, cents]) => {
+    const f = freq * mult * Math.pow(2, cents / 1200);
+    if (f > 19000) return;
+    const osc = ac.createOscillator(), env = ac.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(f, startTime);
+    env.gain.setValueAtTime(0, startTime);
+    env.gain.linearRampToValueAtTime(amp, startTime + attackTime);
+    env.gain.exponentialRampToValueAtTime(amp * 0.65, startTime + 0.10);
+    env.gain.exponentialRampToValueAtTime(amp * 0.18, startTime + 1.0);
+    env.gain.exponentialRampToValueAtTime(0.0001, startTime + decayTime);
+    osc.connect(env); env.connect(master);
+    osc.start(startTime); osc.stop(startTime + decayTime + 0.1);
+  });
+  const sub = ac.createOscillator(), subG = ac.createGain();
+  sub.type = 'sine';
+  sub.frequency.setValueAtTime(freq * 0.5, startTime);
+  subG.gain.setValueAtTime(0, startTime);
+  subG.gain.linearRampToValueAtTime(0.06, startTime + 0.02);
+  subG.gain.exponentialRampToValueAtTime(0.0001, startTime + 2.5);
+  sub.connect(subG); subG.connect(master);
+  sub.start(startTime); sub.stop(startTime + 2.6);
+}
+
+// ─────────────────────────────────────────────
+// MODE SWITCHING
+// ─────────────────────────────────────────────
+function switchMode(m) {
+  mode = m;
+  document.getElementById('tab-interval').classList.toggle('active', m === 'interval');
+  document.getElementById('tab-tuning').classList.toggle('active',   m === 'tuning');
+  document.getElementById('header-sub').textContent =
+    m === 'interval' ? 'Intervalle hören und erkennen' : 'Verstimmung hören und erkennen';
+  stats = { total:0, correct:0 };
+  updateStats();
+  document.getElementById('pfill').style.width = '0%';
+  renderLevelRow();
+  renderPlayGrid();
+  renderAnswerArea();
+  renderWGrid();
+  nextQ();
+}
+
+// ─────────────────────────────────────────────
+// LEVEL ROW
+// ─────────────────────────────────────────────
+function renderLevelRow() {
+  const c = document.getElementById('level-row-container');
+  if (mode === 'interval') {
+    c.innerHTML =
+      '<div class="level-row cols2">' +
+        btn('lvl-int-1', 'Level 1', '7 Intervalle · Grundlagen', ivlLevel===1, "setIvlLevel(1)") +
+        btn('lvl-int-2', 'Level 2', 'alle 12 Intervalle',        ivlLevel===2, "setIvlLevel(2)") +
+      '</div>';
+  } else {
+    c.innerHTML =
+      '<div class="level-row cols2">' +
+        btn('lvl-tune-easy', 'Easy', '±20–50 Cent · Einsteiger', tuneLevel==='easy', "setTuneLevel('easy')") +
+        btn('lvl-tune-hard', 'Hard', '±5–18 Cent · Geübt',       tuneLevel==='hard', "setTuneLevel('hard')") +
+      '</div>';
+  }
+}
+function btn(id, label, sub, active, onclick) {
+  return '<button class="lvl-btn'+(active?' active':'')+'" id="'+id+'" onclick="'+onclick+'">' +
+    label+'<div class="sub">'+sub+'</div></button>';
+}
+
+function setIvlLevel(lv) {
+  ivlLevel = lv;
+  activeIvls = ALL_IVLS.filter(i => i.level <= lv);
+  stats = { total:0, correct:0 }; updateStats();
+  document.getElementById('pfill').style.width = '0%';
+  renderLevelRow(); renderWGrid(); nextQ();
+}
+function setTuneLevel(lv) {
+  tuneLevel = lv;
+  stats = { total:0, correct:0 }; updateStats();
+  document.getElementById('pfill').style.width = '0%';
+  renderLevelRow(); renderWGrid(); nextQ();
+}
+
+// ─────────────────────────────────────────────
+// PLAY GRID
+// ─────────────────────────────────────────────
+function renderPlayGrid() {
+  const pg = document.getElementById('play-grid');
+  if (mode === 'interval') {
+    pg.className = 'play-grid cols2';
+    pg.innerHTML =
+      playBtn('btn-seq',  'seq',  'Intervall') +
+      playBtn('btn-both', 'both', 'Akkord');
+  } else {
+    pg.className = 'play-grid cols3';
+    pg.innerHTML =
+      playBtn('btn-ref',   'ref',   'Referenz') +
+      playBtn('btn-test',  'test',  'Testton') +
+      playBtn('btn-tboth', 'tboth', 'Zusammen');
+  }
+}
+function playBtn(id, phase, label) {
+  return '<button class="pbtn" id="'+id+'" onclick="playPhase(\''+phase+'\')">' +
+    '<svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><path d="M1 1l10 5L1 11z"/></svg>' +
+    label + '</button>';
+}
+
+// ─────────────────────────────────────────────
+// ANSWER AREA
+// ─────────────────────────────────────────────
+function renderAnswerArea() {
+  const lbl = document.getElementById('answer-lbl');
+  if (mode === 'interval') {
+    lbl.textContent = 'Welches Intervall?';
+    document.getElementById('igrid').classList.remove('hidden');
+    document.getElementById('tune-grid').classList.add('hidden');
+  } else {
+    lbl.textContent = 'Wie klingt der Testton?';
+    document.getElementById('igrid').classList.add('hidden');
+    document.getElementById('tune-grid').classList.remove('hidden');
+  }
+  document.getElementById('cent-reveal').classList.remove('show');
+}
+
+// ─────────────────────────────────────────────
+// PLAY PHASE
+// ─────────────────────────────────────────────
+function playPhase(phase) {
+  const ac  = getCtx();
+  const now = ac.currentTime + 0.05;
+  const hold = 2.1, gap = 0.10;
+
+  if (mode === 'interval') {
+    const rf  = midiToHz(cur.root);
+    const ivf = midiToHz(cur.root + activeIvls[cur.iidx].st);
+    setPlaying(phase, true);
+    if (phase === 'seq') {
+      playWarmNote(ac, rf,  now);
+      playWarmNote(ac, ivf, now + hold + gap);
+      setTimeout(() => setPlaying('seq', false), (hold + gap + hold) * 1000 + 300);
+    } else {
+      playWarmNote(ac, rf,  now);
+      playWarmNote(ac, ivf, now);
+      setTimeout(() => setPlaying('both', false), hold * 1000 + 300);
+    }
+  } else {
+    // Tuning mode
+    const refHz  = cur.refHz;
+    const testHz = cur.testHz;
+    setPlaying(phase, true);
+    if (phase === 'ref') {
+      playWarmNote(ac, refHz, now);
+      setTimeout(() => setPlaying('ref', false), hold * 1000 + 300);
+    } else if (phase === 'test') {
+      playWarmNote(ac, testHz, now);
+      setTimeout(() => setPlaying('test', false), hold * 1000 + 300);
+    } else {
+      // tboth — play ref then test sequentially AND together
+      // Sequential first, then together after a pause
+      playWarmNote(ac, refHz,  now);
+      playWarmNote(ac, testHz, now + hold + gap);
+      // Then together
+      const togetherStart = now + (hold + gap) * 2 + 0.15;
+      playWarmNote(ac, refHz,  togetherStart);
+      playWarmNote(ac, testHz, togetherStart);
+      const total = ((hold + gap) * 2 + 0.15 + hold) * 1000 + 300;
+      setTimeout(() => setPlaying('tboth', false), total);
+    }
+  }
+}
+
+function setPlaying(phase, on) {
+  const ids = { seq:'btn-seq', both:'btn-both', ref:'btn-ref', test:'btn-test', tboth:'btn-tboth' };
+  const el = document.getElementById(ids[phase]);
+  if (el) { on ? el.classList.add('playing') : el.classList.remove('playing'); }
+}
+
+// ─────────────────────────────────────────────
+// NEXT QUESTION
+// ─────────────────────────────────────────────
+function nextQ() {
+  cur = { done: false };
+  document.getElementById('fb').className = 'fb';
+  document.getElementById('nxt').style.display = 'none';
+  document.getElementById('cent-reveal').classList.remove('show');
+  // Reset tune buttons
+  ['tbtn-low','tbtn-tune','tbtn-high'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.disabled = false; el.className = 'tune-btn'; }
+  });
+
+  if (mode === 'interval') {
+    cur.root = 48 + Math.floor(Math.random() * 13);
+    cur.iidx = weightedPickIvl();
+    const iv = activeIvls[cur.iidx];
+    document.getElementById('root-display').textContent =
+      'Grundton: ' + NOTES[cur.root % 12] + Math.floor(cur.root / 12 - 1);
+    renderIGrid();
+    setTimeout(() => playPhase('seq'), 400);
+  } else {
+    // Pick random reference note (midi 48–72)
+    const rootMidi = 48 + Math.floor(Math.random() * 13);
+    cur.refHz = midiToHz(rootMidi);
+    cur.noteName = NOTES[rootMidi % 12] + Math.floor(rootMidi / 12 - 1);
+    document.getElementById('root-display').textContent = 'Referenz: ' + cur.noteName;
+
+    // Decide: in tune or detuned?
+    const cfg = TUNE_LEVELS[tuneLevel];
+    const inTune = Math.random() < IN_TUNE_PROB;
+    if (inTune) {
+      cur.centsOff = 0;
+      cur.direction = 'tune';
+    } else {
+      const magnitude = cfg.min + Math.random() * (cfg.max - cfg.min);
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      cur.centsOff = Math.round(magnitude * dir);
+      cur.direction = dir > 0 ? 'high' : 'low';
+    }
+    cur.testHz = centsToHz(cur.refHz, cur.centsOff);
+
+    // Auto-play: ref → test sequentially
+    setTimeout(() => playPhase('tboth'), 400);
+  }
+  renderWGrid();
+}
+
+// ─────────────────────────────────────────────
+// ANSWER — INTERVAL
+// ─────────────────────────────────────────────
+function weightedPickIvl() {
+  const tot = activeIvls.reduce((s, i) => s + ivlWeights[i.short], 0);
+  let r = Math.random() * tot;
+  for (let i = 0; i < activeIvls.length; i++) {
+    r -= ivlWeights[activeIvls[i].short];
+    if (r <= 0) return i;
+  }
+  return activeIvls.length - 1;
+}
+
+function renderIGrid() {
+  const g = document.getElementById('igrid');
+  g.innerHTML = '';
+  activeIvls.forEach((iv, i) => {
+    const b = document.createElement('button');
+    b.className = 'ib'; b.id = 'ib-' + i;
+    b.innerHTML = '<div>' + iv.name + '</div>' +
+      '<div class="ib-sub">' + iv.short + ' · ' + iv.st + ' Halbtöne</div>';
+    b.onclick = () => answerIvl(i);
+    g.appendChild(b);
+  });
+}
+
+function answerIvl(idx) {
+  if (cur.done) return;
+  cur.done = true;
+  const correct = idx === cur.iidx;
+  const chosen  = activeIvls[idx];
+  const target  = activeIvls[cur.iidx];
+  document.querySelectorAll('.ib').forEach((b, i) => {
+    b.disabled = true;
+    if (i === cur.iidx)            b.classList.add('correct');
+    else if (i === idx && !correct) b.classList.add('wrong');
+  });
+  showFeedback(correct,
+    'Richtig! ' + target.name + ' · ' + target.st + ' Halbtöne',
+    'Falsch — es war ' + target.name + '. Gewählt: ' + chosen.name
+  );
+  if (correct) ivlWeights[target.short] = Math.max(1, ivlWeights[target.short] - 2);
+  else {
+    ivlWeights[target.short] = Math.min(20, ivlWeights[target.short] + 3);
+    ivlWeights[chosen.short] = Math.min(20, ivlWeights[chosen.short] + 1);
+  }
+  finishQ(correct, target.short, correct ? '✓' : '✗ ' + chosen.short);
+}
+
+// ─────────────────────────────────────────────
+// ANSWER — TUNING
+// ─────────────────────────────────────────────
+function answerTuning(answer) {
+  if (cur.done) return;
+  cur.done = true;
+  const correct = answer === cur.direction;
+  // Mark buttons
+  ['low','tune','high'].forEach(d => {
+    const el = document.getElementById('tbtn-' + d);
+    el.disabled = true;
+    if (d === cur.direction) el.classList.add('correct');
+    else if (d === answer && !correct) el.classList.add('wrong');
+  });
+  // Build feedback text
+  let correctLabel = cur.direction === 'tune' ? 'In Tune' :
+                     cur.direction === 'high'  ? 'Zu hoch' : 'Zu tief';
+  let chosenLabel  = answer       === 'tune'   ? 'In Tune' :
+                     answer       === 'high'    ? 'Zu hoch' : 'Zu tief';
+  showFeedback(correct,
+    'Richtig! ' + correctLabel,
+    'Falsch — es war ' + correctLabel + '. Gewählt: ' + chosenLabel
+  );
+  // Cent reveal bonus
+  const cr = document.getElementById('cent-reveal');
+  cr.classList.add('show');
+  if (cur.centsOff === 0) {
+    document.getElementById('cent-text').textContent = 'Der Ton war exakt in Tune (0 Cent)';
+  } else {
+    const sign = cur.centsOff > 0 ? '+' : '';
+    document.getElementById('cent-text').textContent =
+      'Abweichung: ' + sign + cur.centsOff + ' Cent ' +
+      (cur.centsOff > 0 ? '(zu hoch)' : '(zu tief)');
+  }
+  // Weights
+  if (correct) tuneWeights[cur.direction] = Math.max(1, tuneWeights[cur.direction] - 2);
+  else {
+    tuneWeights[cur.direction] = Math.min(20, tuneWeights[cur.direction] + 3);
+    tuneWeights[answer]        = Math.min(20, tuneWeights[answer] + 1);
+  }
+  finishQ(correct, cur.direction, correct ? '✓' : '✗ ' + chosenLabel);
+}
+
+// ─────────────────────────────────────────────
+// SHARED FINISH
+// ─────────────────────────────────────────────
+function showFeedback(correct, okText, errText) {
+  const fb     = document.getElementById('fb');
+  const fbText = document.getElementById('fb-text');
+  const fbPath = document.getElementById('fb-icon-path');
+  const fbIcon = document.getElementById('fb-icon');
+  if (correct) {
+    fb.className = 'fb ok';
+    fbPath.setAttribute('d', 'M13.5 4.5L6 12 2.5 8.5');
+    fbIcon.setAttribute('stroke', '#27500A');
+    fbText.textContent = okText;
+  } else {
+    fb.className = 'fb err';
+    fbPath.setAttribute('d', 'M12 4L4 12M4 4l8 8');
+    fbIcon.setAttribute('stroke', '#791F1F');
+    fbText.textContent = errText;
+  }
+}
+
+function finishQ(correct, key, badgeLabel) {
+  stats.total++; if (correct) stats.correct++;
+  const label = mode === 'interval'
+    ? (cur.noteName || NOTES[cur.root % 12]) + ' → ' + (activeIvls[cur.iidx] ? activeIvls[cur.iidx].name : key)
+    : cur.noteName + ' → ' + (cur.direction === 'tune' ? 'In Tune' : cur.direction === 'high' ? 'Zu hoch' : 'Zu tief');
+  history.unshift({ label, correct, badgeLabel });
+  if (history.length > 40) history.pop();
+  updateStats(); renderHistory(); renderWGrid();
+  document.getElementById('nxt').style.display = 'block';
+  document.getElementById('pfill').style.width =
+    Math.min(100, Math.round(stats.correct / stats.total * 100)) + '%';
+}
+
+// ─────────────────────────────────────────────
+// STATS & HISTORY
+// ─────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('s-total').textContent   = stats.total;
+  document.getElementById('s-correct').textContent = stats.correct;
+  document.getElementById('s-pct').textContent     =
+    stats.total ? Math.round(stats.correct / stats.total * 100) + '%' : '—';
+}
+
+function renderHistory() {
+  const el = document.getElementById('hlist');
+  if (!history.length) {
+    el.innerHTML = '<div style="font-size:12px;color:#9e9d97;padding:5px 9px">Noch keine Antworten</div>';
+    return;
+  }
+  el.innerHTML = history.slice(0, 12).map(h =>
+    '<div class="hitem"><span>' + h.label + '</span>' +
+    '<span class="badge ' + (h.correct ? 'ok' : 'err') + '">' + h.badgeLabel + '</span></div>'
+  ).join('');
+}
+
+// ─────────────────────────────────────────────
+// WEIGHT GRID
+// ─────────────────────────────────────────────
+function renderWGrid() {
+  const el = document.getElementById('wgrid');
+  if (mode === 'interval') {
+    document.getElementById('wcard-title').textContent = 'Lerngewichte — Intervalle';
+    const mx = Math.max(...activeIvls.map(i => ivlWeights[i.short]));
+    el.innerHTML = activeIvls.map(iv => {
+      const w = ivlWeights[iv.short];
+      const pct = Math.round(w / mx * 100);
+      const col = w >= 8 ? '#E24B4A' : w >= 5 ? '#BA7517' : '#639922';
+      return witem(iv.short, iv.name, pct, col);
+    }).join('');
+  } else {
+    document.getElementById('wcard-title').textContent = 'Lerngewichte — Tuning';
+    const cats = [
+      { key:'low',  label:'Zu tief',  name:'Zu tiefe Töne' },
+      { key:'tune', label:'In Tune',  name:'Saubere Töne'  },
+      { key:'high', label:'Zu hoch',  name:'Zu hohe Töne'  },
+    ];
+    const mx = Math.max(...cats.map(c => tuneWeights[c.key]));
+    el.innerHTML = cats.map(c => {
+      const w = tuneWeights[c.key];
+      const pct = Math.round(w / mx * 100);
+      const col = w >= 8 ? '#E24B4A' : w >= 5 ? '#BA7517' : '#639922';
+      return witem(c.label, c.name, pct, col);
+    }).join('');
+  }
+}
+function witem(short, name, pct, col) {
+  return '<div class="witem"><div class="witem-short">' + short + '</div>' +
+    '<div class="witem-long">' + name + '</div>' +
+    '<div class="wbar-bg"><div class="wbar-fill" style="width:' + pct + '%;background:' + col + '"></div></div></div>';
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+activeIvls = ALL_IVLS.filter(i => i.level <= 1);
+renderLevelRow();
+renderPlayGrid();
+renderAnswerArea();
+renderWGrid();
+nextQ();
+</script>
+</body>
+</html>
