@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musiktraining Portal</title>
+    <style>
+        /* Grundlegendes Design und Schriftart */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f4f8; /* Leichtes, augenschonendes Grau-Blau */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Container für den Inhalt */
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+
+        /* Layout für die Buttons */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Standard-Design für die Buttons */
+        .btn {
+            display: inline-block;
+            padding: 16px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #ffffff;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Hover-Effekt: Button bewegt sich leicht nach oben */
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Spezifische Farben für die verschiedenen Trainer */
+        .btn-ear {
+            background-color: #3498db; /* Blau */
+        }
+        .btn-ear:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-chord {
+            background-color: #e67e22; /* Orange */
+        }
+        .btn-chord:hover {
+            background-color: #d35400;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎵 Musiktraining</h1>
+        <p>Wähle deine Übung aus, um zu starten:</p>
+
+        <div class="button-group">
+            <!-- Link zum Ear Trainer -->
+            <a href="gehoertraining_update_tuning.html" class="btn btn-ear">
+                Ear Trainer
+            </a>
+
+            <!-- Link zum Chord Trainer -->
+            <a href="quintenzirkel_trainer.html" class="btn btn-chord">
+                Chord Trainer
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
