@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musiktheorie Trainer</title>
+    <style>
+        /* Grundlegendes Design */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            text-align: center; 
+            background-color: #2c3e50; 
+            color: #ecf0f1; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        
+        .container { 
+            background: #34495e; 
+            max-width: 650px; 
+            margin: 0 auto; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); 
+        }
+
+        h1 { margin-top: 0; }
+
+        /* Navigation */
+        .nav { margin-bottom: 30px; display: flex; justify-content: center; gap: 10px; }
+        .nav button { 
+            background-color: #7f8c8d; 
+            border-radius: 20px; 
+            padding: 10px 15px;
+            font-size: 16px;
+        }
+        .nav button.active { background-color: #f39c12; }
+        .nav button:hover { filter: brightness(1.1); transform: none; }
+
+        /* Quiz Bereich */
+        .question { 
+            font-size: 24px; 
+            font-weight: bold; 
+            margin: 20px 0; 
+            color: #f1c40f;
+            min-height: 60px;
+        }
+        
+        .feedback { 
+            font-size: 18px; 
+            font-weight: bold; 
+            min-height: 25px; 
+            margin-bottom: 20px; 
+        }
+        .correct { color: #2ecc71; }
+        .wrong { color: #e74c3c; }
+
+        /* Button-Raster Modul 1 (Vorzeichen) */
+        .button-grid-vorzeichen { 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 10px; 
+        }
+
+        /* Button-Raster Modul 3 (Modi) */
+        .button-grid-modi { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 10px; 
+        }
+        /* Lokrisch zentrieren in der letzten Zeile */
+        .button-grid-modi button:last-child {
+            grid-column: 2 / span 2;
+        }
+        
+        button { 
+            padding: 15px; 
+            font-size: 18px; 
+            font-weight: bold;
+            border: none; 
+            border-radius: 8px; 
+            background-color: #2980b9; 
+            color: white; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
+        button:hover { background-color: #3498db; transform: scale(1.05); }
+        button:active { transform: scale(0.95); }
+        
+        /* Farben für Vorzeichen */
+        .btn-b { background-color: #8e44ad; }
+        .btn-b:hover { background-color: #9b59b6; }
+        .btn-0 { background-color: #27ae60; }
+        .btn-0:hover { background-color: #2ecc71; }
+        .btn-kreuz { background-color: #c0392b; }
+        .btn-kreuz:hover { background-color: #e74c3c; }
+
+        /* Farben für Modi */
+        .btn-modi { background-color: #d35400; }
+        .btn-modi:hover { background-color: #e67e22; }
+
+        /* Versteckte Module */
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Musiktheorie Trainer</h1>
+        
+        <div class="nav">
+            <button id="nav-btn-1" class="active" onclick="switchTab(1)">1. Vorzeichen</button>
+            <button id="nav-btn-2" onclick="alert('Der Quintenzirkel folgt im nächsten Schritt!')">2. Quintenzirkel</button>
+            <button id="nav-btn-3" onclick="switchTab(3)">3. Modi</button>
+        </div>
+
+        <div id="module-1">
+            <p>Wie viele Vorzeichen hat diese Tonart?</p>
+            <div id="question-1" class="question">Lade...</div>
+            <div id="feedback-1" class="feedback"></div>
+            <div class="button-grid-vorzeichen" id="buttons-1"></div>
+        </div>
+
+        <div id="module-3" class="hidden">
+            <p>Welcher Modus ist gesucht?</p>
+            <div id="question-3" class="question">Lade...</div>
+            <div id="feedback-3" class="feedback"></div>
+            <div class="button-grid-modi" id="buttons-3"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            // Alles verstecken
+            document.getElementById('module-1').classList.add('hidden');
+            document.getElementById('module-3').classList.add('hidden');
+            document.getElementById('nav-btn-1').classList.remove('active');
+            document.getElementById('nav-btn-3').classList.remove('active');
+
+            // Gewähltes zeigen
+            document.getElementById('module-' + tabId).classList.remove('hidden');
+            document.getElementById('nav-btn-' + tabId).classList.add('active');
+        }
+
+
+        // --- MODUL 1: VORZEICHEN ---
+        const tonarten = [
+            // Dur
+            { name: 'C-Dur', answer: '0' }, { name: 'G-Dur', answer: '1#' },
+            { name: 'D-Dur', answer: '2#' }, { name: 'A-Dur', answer: '3#' },
+            { name: 'E-Dur', answer: '4#' }, { name: 'H-Dur', answer: '5#' },
+            { name: 'Fis-Dur', answer: '6#' }, { name: 'Cis-Dur', answer: '7#' },
+            { name: 'F-Dur', answer: '1b' }, { name: 'B-Dur', answer: '2b' },
+            { name: 'Es-Dur', answer: '3b' }, { name: 'As-Dur', answer: '4b' },
+            { name: 'Des-Dur', answer: '5b' }, { name: 'Ges-Dur', answer: '6b' },
+            { name: 'Ces-Dur', answer: '7b' },
+            // Moll
+            { name: 'a-Moll', answer: '0' }, { name: 'e-Moll', answer: '1#' },
+            { name: 'h-Moll', answer: '2#' }, { name: 'fis-Moll', answer: '3#' },
+            { name: 'cis-Moll', answer: '4#' }, { name: 'gis-Moll', answer: '5#' },
+            { name: 'dis-Moll', answer: '6#' }, { name: 'ais-Moll', answer: '7#' },
+            { name: 'd-Moll', answer: '1b' }, { name: 'g-Moll', answer: '2b' },
+            { name: 'c-Moll', answer: '3b' }, { name: 'f-Moll', answer: '4b' },
+            { name: 'b-Moll', answer: '5b' }, { name: 'es-Moll', answer: '6b' },
+            { name: 'as-Moll', answer: '7b' }
+        ];
+
+        const antwortenVorzeichen = ['7b', '6b', '5b', '4b', '3b', '2b', '1b', '0', '1#', '2#', '3#', '4#', '5#', '6#', '7#'];
+        let frageVorzeichen = {};
+
+        function initVorzeichenQuiz() {
+            const grid = document.getElementById('buttons-1');
+            antwortenVorzeichen.forEach(antwort => {
+                const btn = document.createElement('button');
+                btn.innerText = antwort;
+                if (antwort.includes('b')) btn.classList.add('btn-b');
+                else if (antwort.includes('#')) btn.classList.add('btn-kreuz');
+                else btn.classList.add('btn-0');
+                btn.onclick = () => checkVorzeichen(antwort);
+                grid.appendChild(btn);
+            });
+            neueVorzeichenFrage();
+        }
+
+        function neueVorzeichenFrage() {
+            frageVorzeichen = tonarten[Math.floor(Math.random() * tonarten.length)];
+            document.getElementById('question-1').innerText = frageVorzeichen.name;
+            document.getElementById('feedback-1').innerText = "";
+        }
+
+        function checkVorzeichen(antwort) {
+            const fb = document.getElementById('feedback-1');
+            if (antwort === frageVorzeichen.answer) {
+                fb.innerText = "Richtig! 🎉";
+                fb.className = "feedback correct";
+                setTimeout(neueVorzeichenFrage, 1200); 
+            } else {
+                fb.innerText = "Falsch, probiere es nochmal!";
+                fb.className = "feedback wrong";
+            }
+        }
+
+
+        // --- MODUL 3: MODI (KIRCHENTONLEITERN) ---
+        const modiFragen = [
+            { text: "1. Stufe (entspricht natürlichem Dur)", answer: "Ionisch" },
+            { text: "2. Stufe (Moll-Charakter mit großer Sexte)", answer: "Dorisch" },
+            { text: "3. Stufe (Moll-Charakter mit kleiner Sekunde b2)", answer: "Phrygisch" },
+            { text: "4. Stufe (Dur-Charakter mit übermäßiger Quarte #4)", answer: "Lydisch" },
+            { text: "5. Stufe (Dur-Charakter mit kleiner Septime b7)", answer: "Mixolydisch" },
+            { text: "6. Stufe (entspricht natürlichem Moll)", answer: "Äolisch" },
+            { text: "7. Stufe (vermindert, b5 und b2)", answer: "Lokrisch" }
+        ];
+
+        const antwortenModi = ["Ionisch", "Dorisch", "Phrygisch", "Lydisch", "Mixolydisch", "Äolisch", "Lokrisch"];
+        let frageModi = {};
+
+        function initModiQuiz() {
+            const grid = document.getElementById('buttons-3');
+            antwortenModi.forEach(antwort => {
+                const btn = document.createElement('button');
+                btn.innerText = antwort;
+                btn.classList.add('btn-modi');
+                btn.onclick = () => checkModi(antwort);
+                grid.appendChild(btn);
+            });
+            neueModiFrage();
+        }
+
+        function neueModiFrage() {
+            frageModi = modiFragen[Math.floor(Math.random() * modiFragen.length)];
+            document.getElementById('question-3').innerText = frageModi.text;
+            document.getElementById('feedback-3').innerText = "";
+        }
+
+        function checkModi(antwort) {
+            const fb = document.getElementById('feedback-3');
+            if (antwort === frageModi.answer) {
+                fb.innerText = "Richtig! 🎸";
+                fb.className = "feedback correct";
+                setTimeout(neueModiFrage, 1500); 
+            } else {
+                fb.innerText = "Nicht ganz, versuch es nochmal!";
+                fb.className = "feedback wrong";
+            }
+        }
+
+        // Startet beide Quizze beim Laden
+        initVorzeichenQuiz();
+        initModiQuiz();
+    </script>
+</body>
+</html>
